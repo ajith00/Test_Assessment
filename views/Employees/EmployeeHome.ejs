@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Home </title>
+    <%- include('../partials/dependencies') %>
+</head>
+
+<body>
+    <header>
+        <%- include('../partials/employee-header') %>
+    </header>
+
+    <div class="main_container d-flex justify-content-evenly">
+
+        <div class="card m-2">
+            <div class="card-body">
+                <h5 class="card-title">Take the Assessment</h5>
+                <hr>
+                <form action="/test" method="post">
+                    <input type="text" name="AssesmentKey" id="AssesmentKey" class="form-control"
+                        placeholder="Enter the Assessment Key" required>
+                    <button type="submit" class="btn btn-outline-primary rounded-pill m-2">Take Assessment&nbsp;<i
+                            class="bi bi-arrow-right-circle-fill"></i></button>
+                </form>
+            </div>
+            <div class="card w-90 m-2">
+                <div class="card-body alert alert-warning " role="alert">
+                    <h6>Instruction</h6>
+                    <hr>
+                    <ul>
+                        <li>After entering the full screen don't switch to another Windows system will automatically
+                            submit the assessment.</li>
+                        <li>Try to submit the paper within the given time limit.</li>
+                        <li>You are allowed to submit only once, make sure that you have correctly attempted all the
+                            questions before submission.</li>
+                        <li>All questions are compulsory.</li>
+                        <li>Any difficulties while appearing for the Assessment please contact your Trainer.</li>
+                        <li>Make sure all the notifications are disabled.</li>
+                    </ul>
+                </div>
+            </div>
+            <% if (message) { %>
+                <div class="alert alert-danger" role="alert">
+                    <%= message %>
+                </div>
+                <% } %>
+        </div>
+    </div>
+
+    <footer>
+        <%- include('../partials/footer') %>
+    </footer>
+</body>
+<%- include('../partials/dependencies-js') %>
+</html>

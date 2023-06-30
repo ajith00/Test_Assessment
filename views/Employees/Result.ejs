@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Result</title>
+    <%- include('../partials/dependencies') %>
+</head>
+
+<%- include('../partials/employee-header') %>
+<body>
+    <section class="result-section main_container " style="display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 80%;
+    overflow: hidden;
+    ">
+        <div class="text-center result-card">
+            <h1><%= Result.Message%></h1>
+            <h5>Total Score:<%= Result.TotalScore%></h5>
+            <h5>Percentage:<%= Result.SecuredPercentage%></h5>
+            <a href="/EmployeeHome">Go Back to Home...</a>
+        </div>
+    </section>
+</body>
+<style>
+
+:root {
+  --color-background: #ffffff;
+  --stroke-width: calc(1em / 16);
+  --font-size: 50px;
+  --font-weight: 700;
+  --letter-spacing: calc(1em / 8);
+}
+    .result-card{
+       border-radius: 20px;
+  place-items: center;
+        background-color: var(--color-background);
+        box-sizing: border-box;
+        box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px; padding: 20px;
+        transform: translateY(-10%);
+  animation: floater 1.5s ;
+  transition: ease 0.5s;
+    }
+    @keyframes floater {
+  0%{transform: translateY(-90%);transition: ease 0.2s;}
+  50%{transform: translateY(10%);transition: ease 0.5s;}
+}
+
+h1 {
+    border-radius: 15px;
+    font-family: 'Pacifico', cursive;
+  background-clip: text;
+  background-image: linear-gradient(to right, #09f1b8, #00a2ff, #ff00d2, #fed90f);
+  color: var(--color-background);
+  font-size: var(--font-size);
+  font-weight: var(--font-weight);
+  letter-spacing: var(--letter-spacing);
+  padding: calc(--stroke-width / 2);
+  -webkit-text-stroke-color: transparent;
+  -webkit-text-stroke-width: var(--stroke-width);
+}
+</style>
+<%- include('../partials/dependencies-js') %>
+</html>

@@ -1,0 +1,90 @@
+  /*  req.body.section.forEach((questions) => {
+    questions.forEach((question) => {
+       const { question: questionText, option1, option2, option3, option4, answer, questionType } = question;
+       db.query('INSERT INTO questions (question, option1, option2, option3, option4, answer, question_type) VALUES (?, ?, ?, ?, ?, ?, ?)',
+         [questionText, option1, option2, option3, option4, answer, questionType],
+         (err, result) => {
+           if (err) {
+             throw err;
+           }
+           console.log('New question inserted');
+         }
+       );
+ 
+     });
+   });*/
+  {
+    "Date": "2023-06-03",
+    "Title": "Computer Fundamentals",
+    "Cutoff": "80",
+    "Duration": "5",
+    "Section1": {
+      "MaxScore": 7,
+      "Question1": {
+        "type": "MCQ",
+        "point": "2",
+        "answer": "PROLOG",
+        "options": {
+          "Option1": "PROLOG",
+          "Option2": "PROLOG",
+          "Option3": "PROLOG",
+          "Option4": "C"
+        },
+        "question": "Which of these computer languages do we use in artificial intelligence?",
+        "correctOption": "1"
+      },
+      "Question2": {
+        "type": "MCQ",
+        "point": "2",
+        "answer": "Control unit",
+        "options": {
+          "Option1": "Logic unit",
+          "Option2": "Control unit",
+          "Option3": " Storage unit",
+          "Option4": "Input"
+        },
+        "question": "Which of these parts would interpret a program’s instructions to initiate the control operations?",
+        "correctOption": "2"
+      },
+      "Question3": {
+        "type": "Boolean",
+        "point": "3",
+        "answer": "False",
+        "options": {
+          "Option1": "True",
+          "Option2": "False"
+        },
+        "question": "The 1’s complement of 10 is 11?",
+        "correctOption": "False"
+      }
+    },
+    "Section2": {
+      "MaxScore": 5,
+      "Question1": {
+        "type": "MCQ",
+        "point": "2",
+        "answer": "Frame",
+        "options": {
+          "Option1": "Group",
+          "Option2": "Block",
+          "Option3": "Frame",
+          "Option4": "Path"
+        },
+        "question": "The 1’s complement of 10 is:",
+        "correctOption": "3"
+      },
+      "Question2": {
+        "type": "Boolean",
+        "point": "3",
+        "answer": "False",
+        "options": {
+          "Option1": "True",
+          "Option2": "False"
+        },
+        "question": "A list of various coded instructions is known as FlowChart",
+        "correctOption": "False"
+      }
+    },
+    "TotalScore": 12,
+    "Description": "New test with cut off"
+  }
