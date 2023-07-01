@@ -136,7 +136,7 @@ $(document).ready(function () {
       <h2 class="accordion-header">
         <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#section${sectionCounter}"
           aria-expanded="true" aria-controls="section${sectionCounter}">
-          <input type="text" class="form-control bg-light-subtle border border-light-subtle rounded-pill w-25" name="SectionName" id="" placeholder="Please enter the section-${sectionCounter} name" required>
+          <input type="text" class="form-control bg-light-subtle border border-light-subtle rounded-pill w-25" name="SectionName${sectionCounter}" id="" placeholder="Please enter the section-${sectionCounter} name" required>
           <p class="container px-1 mb-1 text-center">Max-Points:&nbsp;<b><span id="sectionScore${sectionCounter}">0</b></span></p>
         </button>
       </h2>
@@ -241,7 +241,7 @@ function submitForm() {
     var sectionData = {};
     var sectionId = "Section" + i;
     var SectionWiseMarks = 0;
-    sectionData.SectionName=section.querySelector('input[type="text"][name=*="SectionName"]').value;
+    sectionData.SectionName=section.querySelector('input[type="text"][name*="SectionName"]').value;
     var questions = section.querySelectorAll('.question');
     let j = 1;
     questions.forEach(function (question) {
