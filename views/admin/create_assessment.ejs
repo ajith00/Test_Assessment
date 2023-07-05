@@ -67,7 +67,7 @@
             </div>
           </div>
 
-          <div class="accordion section" id="accordionSection1" onclick="updateActiveSheet(this)">
+          <div class="accordion section mySection" id="accordionSection1" data-section="1" onclick="updateActiveSheet(this)">
             <div class="accordion-item">
               <h2 class="accordion-header d-flex justify-content-between">
                 
@@ -75,7 +75,7 @@
                   aria-expanded="true" aria-controls="section1">
                 
                   <input type="text" class="form-control bg-light-subtle border border-light-subtle rounded-pill w-25" name="SectionName" id="" placeholder="Please enter the section-1 name" required>
-                  <p class="container px-1 mb-1 text-center">Max-Points:&nbsp;<b><span id="sectionScore1">0</b></span></p>
+                  <p class="container px-1 mb-1 text-center">Max-Points:&nbsp;<b><span class="sectionScore" id="sectionScore1">0</b></span></p>
                 </button>
 
               </h2>
@@ -84,10 +84,13 @@
                 </div>
 
                 <div class="container px-1 mb-1 text-center">
-                  <button type="button" class="btn btn-outline-info" data-bs-toggle="modal"
+                  <button type="button" class="btn btn-outline-info rounded-pill" data-bs-toggle="modal"
                     data-bs-target="#AddNewItem">
                     Add <i class="bi bi-plus-circle"></i>
                   </button>
+                  <button type="button" class="btn mb-1 btn-outline-danger rounded-pill removeSectionBtn" data-bs-toggle="modal" data-section="1">
+                    Delete <i class="bi bi-trash3"></i>
+                  </button> 
                 </div>
               </div>
             </div>
@@ -98,12 +101,6 @@
           <textarea name="JsonFormData" id="JsonFormData" style="display: none;"></textarea>
         </div>
       </form>
-<!-- The Modal -->
-<div id="myModal" class="Localmodal">
-  <span class="close">&times;</span>
-  <img class="modal-content" id="img01">
-  <div id="caption"></div>
-</div>
     </div>
     </div>
 
@@ -126,21 +123,35 @@
               Section</button>
 
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Model for Image -->
+    <div class="modal fade" id="Image_Model" tabindex="-1" aria-labelledby="Image_Model" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <img class="img-fluid" id="img01">
           </div>
         </div>
       </div>
     </div>
 
-
   </body>
+  <%- include('../partials/dependencies-js') %>
   <script>
     document.getElementById("questionnaire").addEventListener('submit', (e) => {
       e.preventDefault();
       submitForm();
     });
+
+    $('#Image_Model').on('show.bs.modal', function (event) {
+});
   </script>
-  <%- include('../partials/dependencies-js') %>
+
 
 </html>

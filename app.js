@@ -1,7 +1,6 @@
 const express = require('express');
 const session = require('express-session');
 const app = express();
-const port = 3000
 const path = require("path");
 const mysql = require('mysql');
 const bodyParser = require('body-parser');
@@ -47,7 +46,7 @@ const myFileFilter = (req, file, error) => {
     cb(new Error("Not a PDF File!!"), false);
   }
 };
-const upload = multer({ storage: myStorage, limits: { fileSize: 1000000 } }).single("myQCImage");
+const upload = multer({ storage: myStorage, limits: { fileSize: 500000 } }).single("myQCImage");
 
 app.use(session({
   resave: false,
@@ -66,8 +65,9 @@ db.connect((error) => {
 });
 
 
+const port = 4000;
+const host="172.17.1.22"
 const server = app.listen(port, function () {
-  const port = server.address().port;
   console.log("App is listening at http://localhost:%s", port);
 });
 
@@ -82,7 +82,7 @@ app.get('/logout', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  res.render('login', { "message": "Succes" })
+  res.render('login', { "message": "Success" })
 });
 
 app.get('/CreateAssessment', (req, res) => {
@@ -203,7 +203,7 @@ app.get('/TrainerHome', (req, res) => {
             result.AssessmentID = record.AssessmentID;
             result.AssessmentName = record.AssessmentName;
             result.Description = record.Description;
-            result.AssessmentDate = record.AssessmentDate;
+            result.AssessmentDate =formatDateString(record.AssessmentDate);
             result.Duration = record.Duration;
             result.AssesmentKey = record.AssesmentKey;
             result.MaximumScore = record.MaximumScore;

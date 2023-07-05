@@ -114,14 +114,14 @@ animation-timing-function: linear;
                           <% if (questionName !=='MaxScore' && questionName!="SectionName" ) { %>
                             <% const question=section[questionName]; %>
                               <div class="questionn">
-                                <div class="d-flex justify-content-between m-2 p-1 ">
-                                  <p class="fs-5"><span><b>
+                                <div class="d-flex  align-items-end  m-2 p-1 ">
+                                  <p class="fs-5 flex-grow-1"><b>
                                         Question <%= i %>
                                       </b>
-                                      <textarea name="" id="" cols="180" rows="1" class="form-control"
-                                        readonly><%= question['question'] %></textarea> </span>
+                                      <textarea name="" id="" cols="160" rows="1" class="form-control"
+                                        readonly><%= question['question'] %></textarea> 
                                   </p>
-                                  <p><b>Point:</b>
+                                  <p style="margin-left:10px ;"><b>Point:</b>
                                     <%= question['point'] %>
                                   </p>
                                 </div>

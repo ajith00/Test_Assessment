@@ -7,7 +7,7 @@ var activeSection = 1;
 
 $(document).ready(function () {
   const currentDate = new Date().toISOString().split('T')[0];
-  if(document.getElementById('AssessmentDate')){
+  if (document.getElementById('AssessmentDate')) {
     document.getElementById("AssessmentDate").setAttribute("min", currentDate);
   }
 
@@ -24,17 +24,17 @@ $(document).ready(function () {
           <textarea class="form-control" name="section[${activeSection}]question[${questionCounter}][question]" id="question${questionCounter}" cols="90" rows="1" wrap="soft" spellcheck="true" required></textarea>
         </div>
         <div class="options">
-        <div class="d-flex justify-content-between align-items-center m-2 p-1">
+        <div class="d-flex justify-content-between align-items-end m-2 p-1">
         <div><p>Choose the Correct Answer,
         After filling up the options</p>
         </div>
-        <div>
+        <div >
         <label for="imageInput${questionCounter}" class="form-label">Attach an Image</label>
         <input class="form-control" type="file" id="imageInput${questionCounter}" name="myQCImage" onchange="uploadImage(this,'section[${activeSection}]question[${questionCounter}][referenceImage]','section[${activeSection}]question[${questionCounter}][uploadedImage]');">
          <input type="hidden" name="section[${activeSection}]question[${questionCounter}][referenceImage]" id="section[${activeSection}]question[${questionCounter}][referenceImage]" readonly>
         </div>
         <div>
-        <img id="section[${activeSection}]question[${questionCounter}][uploadedImage]"  class="img-thumbnail" height="50" width="50" onclick="ExpandImage(this)" src="" alt="Uploaded Image" />
+        <img id="section[${activeSection}]question[${questionCounter}][uploadedImage]"  class="img-thumbnail" height="100" width="100" onclick="ExpandImage(this)" src="" alt="Uploaded Image" style="display:none" data-bs-toggle="modal" data-bs-target="#Image_Model"/>
         </div>
         <div class=" input-group mb-3" style="width: max-content;">
         <span class="input-group-text" for="score${questionCounter}">Points</span>
@@ -100,7 +100,7 @@ $(document).ready(function () {
          <input type="hidden" name="section[${activeSection}]question[${questionCounter}][referenceImage]" id="section[${activeSection}]question[${questionCounter}][referenceImage]" readonly>
         </div>
         <div>
-        <img id="section[${activeSection}]question[${questionCounter}][uploadedImage]"  class="img-thumbnail" height="50" width="50" onclick="ExpandImage(this)" src="" alt="Uploaded Image" />
+        <img id="section[${activeSection}]question[${questionCounter}][uploadedImage]"  class="img-thumbnail" height="100" width="100" onclick="ExpandImage(this)" src="" alt="Uploaded Image" style="display:none" data-bs-toggle="modal" data-bs-target="#Image_Model"/>
         </div>
         <div class=" input-group mb-3" style="width: max-content;">
         <span class="input-group-text" for="score${questionCounter}">Points</span>
@@ -131,13 +131,13 @@ $(document).ready(function () {
 
 
   $('#Add_Section_Button').click(function () {
-    const sectionHTML = `<div class="accordion section" id="accordionSection${sectionCounter}"  onclick="updateActiveSheet(this)">
+    const sectionHTML = `<div class="accordion section mySection" id="accordionSection${sectionCounter}"  onclick="updateActiveSheet(this)" data-section="${sectionCounter}"">
     <div class="accordion-item">
       <h2 class="accordion-header">
         <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#section${sectionCounter}"
           aria-expanded="true" aria-controls="section${sectionCounter}">
           <input type="text" class="form-control bg-light-subtle border border-light-subtle rounded-pill w-25" name="SectionName${sectionCounter}" id="" placeholder="Please enter the section-${sectionCounter} name" required>
-          <p class="container px-1 mb-1 text-center">Max-Points:&nbsp;<b><span id="sectionScore${sectionCounter}">0</b></span></p>
+          <p class="container px-1 mb-1 text-center">Max-Points:&nbsp;<b><span class="sectionScore" id="sectionScore${sectionCounter}">0</b></span></p>
         </button>
       </h2>
       <div id="section${sectionCounter}" class="accordion-collapse collapse show" data-bs-parent="#accordionSection${sectionCounter}">
@@ -145,9 +145,12 @@ $(document).ready(function () {
         </div>
       </div>
       <div class="container px-1 mb-1 text-center">
-      <button type="button" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#AddNewItem">
+      <button type="button" class="btn btn-outline-info rounded-pill" data-bs-toggle="modal" data-bs-target="#AddNewItem">
         Add <i class="bi bi-plus-circle"></i>
       </button>
+      <button type="button" class="btn mb-1 btn-outline-danger rounded-pill removeSectionBtn" data-bs-toggle="modal" data-section="${sectionCounter}">
+      Delete <i class="bi bi-trash3"></i>
+    </button>
       </div>
     </div>
   </div>`;
@@ -162,14 +165,26 @@ $(document).ready(function () {
     questionCounter--;
     updateQuestionNumbers();
   });
+
+  $(document).on('click', '.removeSectionBtn', function () {
+    const sectionNumber = $(this).data('section');
+    console.log(sectionNumber);
+    if(confirm("Are you sure you want to delete this section...?") && sectionCounter>2){
+      $(`div.section[data-section="${sectionNumber}"]`).remove();
+      sectionCounter--;
+      updateSectionNumbers();
+      updateQuestionNumbers();
+    }
+
+  });
 });
 
 
-function setAnswer(option,type) {
-  if(type=='mcq'){
+function setAnswer(option, type) {
+  if (type == 'mcq') {
     document.getElementById("answer" + option.name[19]).value = document.getElementById("option" + option.value + "_" + option.name[19]).value;
-  }else if(type=='boolean'){
-    document.getElementById("answer" + option.name[19]).value=option.value;
+  } else if (type == 'boolean') {
+    document.getElementById("answer" + option.name[19]).value = option.value;
   }
 }
 
@@ -224,7 +239,32 @@ function updateQuestionNumbers() {
   });
 }
 
+function updateSectionNumbers(){
+  $('.mySection').each(function (index) {
+    const newSectionCounter = index + 1;
+    // Update section ID
+    $(this).attr('id', 'accordionSection' + newSectionCounter);
+    $(this).attr('data-section', newSectionCounter);
+    // Update section data attribute
 
+    $(this).find('.accordion-button').attr('data-bs-target', '#section' + newSectionCounter);
+    $(this).find('.accordion-button').attr('aria-controls', 'section' + newSectionCounter);
+
+    // Update input placeholder
+    $(this).find('input').attr('placeholder', 'Please enter the section-' + newSectionCounter + ' name');
+    // Update Max-Points ID
+    $(this).find('.sectionScore').attr('id', 'sectionScore' + newSectionCounter);
+    
+    // Update data-bs-parent attribute
+    $(this).find('.accordion-collapse').attr('data-bs-parent', '#accordionSection' + newSectionCounter);
+    $(this).find('.accordion-collapse').attr('id', 'section' + newSectionCounter);
+
+    // Update questionsContainer ID
+    $(this).find('.accordion-body').attr('id', 'questionsContainer' + newSectionCounter);
+
+    $(this).find('.removeSectionBtn').attr('data-section', newSectionCounter);
+});
+}
 
 function submitForm() {
   var formData = {};
@@ -232,32 +272,32 @@ function submitForm() {
   let i = 1;
   formData.Title = document.getElementById("AssessmentTitle").value;
   formData.Description = document.getElementById("AssessmentDescriptinon").value;
-  formData.Date = document.getElementById("AssessmentDate").value;
+  formData.Date =  document.getElementById("AssessmentDate").value;
   formData.Duration = document.getElementById("AssessmentDuration").value;
   formData.Cutoff = document.getElementById("AssessmentCutoff").value;
-  
+
   let TotalScore = 0;
   sections.forEach(function (section) {
     var sectionData = {};
     var sectionId = "Section" + i;
     var SectionWiseMarks = 0;
-    sectionData.SectionName=section.querySelector('input[type="text"][name*="SectionName"]').value;
+    sectionData.SectionName = section.querySelector('input[type="text"][name*="SectionName"]').value;
     var questions = section.querySelectorAll('.question');
     let j = 1;
     questions.forEach(function (question) {
       var questionData = {};
-      var questionID = "Question" + j;      
+      var questionID = "Question" + j;
       questionData.question = question.querySelector('textarea').value;
       let ImageLoc = question.querySelector('input[type="hidden"][name*="referenceImage"]').value;
-      if(ImageLoc.length>1){
-        questionData.referenceImage=ImageLoc;
+      if (ImageLoc.length > 1) {
+        questionData.referenceImage = ImageLoc;
       }
       var type = question.querySelector('input[type="hidden"][name*="questionType"]').value;
-      if(type=='MCQ'){
-      var options = question.querySelectorAll('input[type="text"]');
-    }else if(type=='Boolean'){
-      var options=question.querySelectorAll('input[type="radio"]');
-    }
+      if (type == 'MCQ') {
+        var options = question.querySelectorAll('input[type="text"]');
+      } else if (type == 'Boolean') {
+        var options = question.querySelectorAll('input[type="radio"]');
+      }
 
       var optionData = {}, k = 1;
       options.forEach(function (option) {
@@ -289,7 +329,7 @@ function submitForm() {
   document.getElementById("questionnaire").submit();
 }
 
-function SubmitAssessment(){
+function SubmitAssessment() {
   let answerData = {};
   let sections = document.querySelectorAll('.section');
   let i = 1;
@@ -306,9 +346,6 @@ function SubmitAssessment(){
       questionData.question = question.querySelector('textarea').value;
       var correctOption = question.querySelector('input[type="radio"]:checked');
       var correctValue = correctOption ? correctOption.value : null;
-/*      if(correctValue==null){
-        alert("Few answers are not not selected Properly.\nChoose the Correct answer for all the questions after filling up the Text Box.");
-      }*/
       questionData.correctOption = correctValue;
       sectionData[questionID] = questionData;
       j++;
@@ -317,110 +354,81 @@ function SubmitAssessment(){
     i++
   });
   document.getElementById("JsonFormData").value = JSON.stringify(answerData);
-  console.log(answerData);
-document.getElementById("answerScript").submit();
-
+  document.getElementById("answerScript").submit(); 
 }
 
 
 function enterFullScreen(element) {
-  if(element.requestFullscreen) {
+  if (element.requestFullscreen) {
     element.requestFullscreen();
-  }else if (element.mozRequestFullScreen) {
+  } else if (element.mozRequestFullScreen) {
     element.mozRequestFullScreen();     // Firefox
-  }else if (element.webkitRequestFullscreen) {
+  } else if (element.webkitRequestFullscreen) {
     element.webkitRequestFullscreen();  // Safari
-  }else if(element.msRequestFullscreen) {
+  } else if (element.msRequestFullscreen) {
     element.msRequestFullscreen();      // IE/Edge
   }
 };
 
-// public/script.js
-
-function uploadImage(e,NewLocFieldId,NewImageLoc) {
+function uploadImage(e, NewLocFieldId, NewImageLoc) {
   const fileInput = document.getElementById(e.id);
   const file = fileInput.files[0];
-
   const formData = new FormData();
   formData.append('myQCImage', file);
-
   axios.post('/api/uploadImage', formData)
     .then(response => {
-      console.log(response.data); // Server response
-      document.getElementById(NewLocFieldId).value=response.data;
-      displayImage(file,NewImageLoc);
+      document.getElementById(NewLocFieldId).value = response.data;
+      displayImage(file, NewImageLoc);
     })
     .catch(error => {
       console.error(error);
     });
-} 
+}
 
-function displayImage(file,NewImageLoc) {
+function displayImage(file, NewImageLoc) {
   const reader = new FileReader();
   reader.onload = function () {
     const uploadedImage = document.getElementById(NewImageLoc);
     uploadedImage.src = reader.result;
+    uploadedImage.style.display="block";
   };
   reader.readAsDataURL(file);
 }
 
-function ExpandImage(e){
-  // Get the modal
-var modal = document.getElementById("myModal");
-
-// Get the image and insert it inside the modal - use its "alt" text as a caption
-var modalImg = document.getElementById("img01");
-var captionText = document.getElementById("caption");
-
-  modal.style.display = "block";
+function ExpandImage(e) {
+  var modalImg = document.getElementById("img01");
   modalImg.src = e.src;
-  //captionText.innerHTML = e.alt;
-
-// Get the <span> element that closes the modal
-var span = document.getElementsByClassName("close")[0];
-
-// When the user clicks on <span> (x), close the modal
-span.onclick = function() { 
-  modal.style.display = "none";
-}
-// When the user clicks anywhere outside of the modal, close it
-window.onclick = function(event) {
-  if (event.target == modal) {
-    modal.style.display = "none";
-  }
-}
 }
 
-function UpdateTotalPoints(){
+function UpdateTotalPoints() {
   let sections = document.querySelectorAll('.section');
-  let i = 1,total=0;
+  let i = 1, total = 0;
   sections.forEach(function (section) {
     let SectionWiseMarks = 0;
     let questions = section.querySelectorAll('.question');
     questions.forEach(function (question) {
       let point = question.querySelector('input[type="number"][name*="score"]').value;
-      if(parseInt(point)>0){
+      if (parseInt(point) > 0) {
         SectionWiseMarks += parseInt(point);
-      }     
+      }
     });
-    section.querySelector('span[id*="sectionScore"]').innerHTML=SectionWiseMarks;
-    total+=SectionWiseMarks;
+    section.querySelector('span[id*="sectionScore"]').innerHTML = SectionWiseMarks;
+    total += SectionWiseMarks;
   });
-  if(total>0){
-    document.getElementById("AssessmentTotalMarks").value=total;
-  }else{
+  if (total > 0) {
+    document.getElementById("AssessmentTotalMarks").value = total;
+  } else {
     alert("Invalid Points...!");
   }
 }
 
 
-document.addEventListener('keydown', function(e) {
+document.addEventListener('keydown', function (e) {
   console.log(e);
-    if (e.shiftKey && e.ctrlKey && e.code=='KeyI') {
-      
-      e.preventDefault();
-    }
-    if(e.code=="Escape"){
-      e.preventDefault();
-    }
+  if (e.shiftKey && e.ctrlKey && e.code == 'KeyI') {
+    e.preventDefault();
+  }
+  if (e.code == "Escape") {
+    e.preventDefault();
+  }
 });

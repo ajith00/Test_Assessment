@@ -12,7 +12,7 @@
 
   <body>
     <style>
-         #progressBar {
+      #progressBar {
         width: 99%;
         margin: 10px auto;
         height: 22px;
@@ -28,9 +28,10 @@
         padding: 0 10px;
         line-height: 22px;
         width: 0;
-        transition:all 0.1s linear;
-        -webkit-animation-timing-function: linear; /* Chrome, Safari, Opera */
-animation-timing-function: linear;
+        transition: all 0.1s linear;
+        -webkit-animation-timing-function: linear;
+        /* Chrome, Safari, Opera */
+        animation-timing-function: linear;
         background-color: #cbea00;
         box-sizing: border-box;
         border-radius: 30px;
@@ -66,107 +67,110 @@ animation-timing-function: linear;
                   <span class="input-group-text">Minutes</span>
                 </div>
               </div>
-           
-            <div class="col-md">
-              <div class=" input-group mb-3">
-                <span class="input-group-text" for="AssessmentDuration">Cut-Off</span>
-                <input type="number" name="AssessmentCutoff" id="AssessmentCutoff" class="form-control" min="40"
-                  max="100" required placeholder="Min 40%" value="<%= jsonData.Cutoff %>">
-                <span class="input-group-text">%</span>
+
+              <div class="col-md">
+                <div class=" input-group mb-3">
+                  <span class="input-group-text" for="AssessmentDuration">Cut-Off</span>
+                  <input type="number" name="AssessmentCutoff" id="AssessmentCutoff" class="form-control" min="40"
+                    max="100" required placeholder="Min 40%" value="<%= jsonData.Cutoff %>">
+                  <span class="input-group-text">%</span>
+                </div>
               </div>
             </div>
           </div>
+        </div>
+
+        <div class="text-center">
+          <button class="btn btn-primary" id="fullscreenButton"> Start</button>
+        </div>
+        <form action="/submit-assessment" method="post" id="answerScript" style="display: none;">
+          <div id="progressBar">
+            <div class="bar"></div>
           </div>
+          <input type="hidden" name="AssessmentID" id="AssessmentID" value="<%= result.AssessmentID %>" readonly>
+          <input type="hidden" name="AssessmentKey" id="AssessmentKey" value="<%= result.AssesmentKey %>" readonly>
+          <input type="hidden" name="AssessmentRemarks" id="AssessmentRemarks" value="N/A" readonly>
+          <!-- Loop through sections -->
+          <% for (const sectionName in jsonData) { %>
+            <% if (sectionName.startsWith('Section')) { %>
+              <% const section=jsonData[sectionName]; %>
+                <div class="accordion section m-2" id="accordion<%= sectionName %>">
+                  <div class="accordion-item">
+                    <h2 class="accordion-header">
+                      <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#<%= sectionName %>" aria-expanded="true" aria-controls="<%= sectionName %>">
+                        <input type="text"
+                          class="form-control bg-light-subtle border border-light-subtle rounded-pill w-25"
+                          name="SectionName" value="<%= section.SectionName %>" readonly>
+                        <p class="container px-1 mb-1 text-center"><b>MaxPoints:<span id="<%= sectionName %>Score">
+                              <%= section.MaxScore %></b></span></p>
+                      </button>
+                    </h2>
+                    <div id="<%= sectionName %>" class="accordion-collapse collapse show"
+                      data-bs-parent="#accordion<%= sectionName %>">
+                      <div class="accordion-body" id="questionsContainer1">
+                        <% var i=1; %>
+                          <% for (const questionName in section) { %>
 
-        </div>
-     
-      <div class="text-center">
-        <button class="btn btn-primary" id="fullscreenButton"> Start</button>
-      </div>
-      <form action="/submit-assessment" method="post" id="answerScript" style="display: none;">
-        <div id="progressBar">
-          <div class="bar"></div>
-        </div>
-        <input type="hidden" name="AssessmentID" id="AssessmentID" value="<%= result.AssessmentID %>" readonly>
-        <input type="hidden" name="AssessmentKey" id="AssessmentKey" value="<%= result.AssesmentKey %>" readonly>
-        <input type="hidden" name="AssessmentRemarks" id="AssessmentRemarks" value="N/A" readonly>
-        <!-- Loop through sections -->
-        <% for (const sectionName in jsonData) { %>
-          <% if (sectionName.startsWith('Section')) { %>
-            <% const section=jsonData[sectionName]; %>
-              <div class="accordion section m-2" id="accordion<%= sectionName %>">
-                <div class="accordion-item">
-                  <h2 class="accordion-header">
-                    <button class="accordion-button" type="button" data-bs-toggle="collapse"
-                      data-bs-target="#<%= sectionName %>" aria-expanded="true" aria-controls="<%= sectionName %>">
-                      <input type="text" class="form-control bg-light-subtle border border-light-subtle rounded-pill w-25" name="SectionName" value="<%= section.SectionName %>" readonly>
-                      <p class="container px-1 mb-1 text-center"><b>MaxPoints:<span id="<%= sectionName %>Score">
-                            <%= section.MaxScore %></b></span></p>
-                    </button>
-                  </h2>
-                  <div id="<%= sectionName %>" class="accordion-collapse collapse show"
-                    data-bs-parent="#accordion<%= sectionName %>">
-                    <div class="accordion-body" id="questionsContainer1">
-                      <% var i=1; %>
-                        <% for (const questionName in section) { %>
-
-                          <% if (questionName !=='MaxScore' && questionName!="SectionName" ) { %>
-                            <% const question=section[questionName]; %>
-                              <div class="questionn">
-                                <div class="d-flex justify-content-between m-2 p-1 ">
-                                  <p class="fs-5"><span><b>
-                                        Question <%= i %>
-                                      </b>
-                                      <textarea name="" id="" cols="180" rows="1" class="form-control"
-                                        readonly><%= question['question'] %></textarea> </span>
-                                  </p>
-                                  <p><b>Point:</b>
-                                    <%= question['point'] %>
-                                  </p>
-                                </div>
-                                <% if (question['referenceImage'] ) { %>
-                                <div>
-                                  <img id="uploadedImage"  class="rounded img-thumbnail" src="../../public/uploads/Trainer/<%= question['referenceImage'] %>" alt="Uploaded Image" height="100" width="100" onclick="ExpandImage(this)"/>
-                                </div>
-                                <% } %>
-                                <div class="d-flex flex-column fs-5">
-                                  <% for (const key in question['options']) { %>
-
-                                    <div class="p-1 m-1">
-                                      <input type="radio" class="form-check-input"
-                                        name="<%=sectionName+'_'+questionName%>" value="<%= question['options'][key] %>"
-                                        required>
-                                      <label class="form-label" for="<%=sectionName+'_'+questionName %>">
-                                        <%= question['options'][key] %>
-                                      </label>
+                            <% if (questionName !=='MaxScore' && questionName!="SectionName" ) { %>
+                              <% const question=section[questionName]; %>
+                                <div class="questionn">
+                                  <div class="d-flex justify-content-between m-2 p-1 ">
+                                    <p class="fs-5"><span><b>
+                                          Question <%= i %>
+                                        </b>
+                                        <textarea name="" id="" cols="180" rows="1" class="form-control"
+                                          readonly><%= question['question'] %></textarea> </span>
+                                    </p>
+                                    <p><b>Point:</b>
+                                      <%= question['point'] %>
+                                    </p>
+                                  </div>
+                                  <% if (question['referenceImage'] ) { %>
+                                    <div>
+                                      <img id="uploadedImage" class="rounded img-thumbnail"
+                                        src="../../public/uploads/Trainer/<%= question['referenceImage'] %>"
+                                        alt="Uploaded Image" height="100" width="100" onclick="ExpandImage(this)" />
                                     </div>
-
                                     <% } %>
-                                </div>
-                              </div>
-                              <hr>
-                              <% i++} %>
+                                      <div class="d-flex flex-column fs-5">
+                                        <% for (const key in question['options']) { %>
 
-                                <% } %>
+                                          <div class="p-1 m-1">
+                                            <input type="radio" class="form-check-input"
+                                              name="<%=sectionName+'_'+questionName%>"
+                                              value="<%= question['options'][key] %>" required>
+                                            <label class="form-label" for="<%=sectionName+'_'+questionName %>">
+                                              <%= question['options'][key] %>
+                                            </label>
+                                          </div>
+
+                                          <% } %>
+                                      </div>
+                                </div>
+                                <hr>
+                                <% i++} %>
+
+                                  <% } %>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              <% } %>
                 <% } %>
-                  <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                    <button class="btn btn-primary me-md-2" type="submit">Submit</button>
-                    <textarea name="JsonFormData" id="JsonFormData" style="display: none;"></textarea>
-                    
-                  </div>
-      </form>
-<!-- The Modal -->
-<div id="myModal" class="Localmodal">
-  <span class="close">&times;</span>
-  <img class="modal-content" id="img01">
-  <div id="caption"></div>
-</div>
-    </div>
+                  <% } %>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                      <button class="btn btn-primary me-md-2" type="submit">Submit</button>
+                      <textarea name="JsonFormData" id="JsonFormData" style="display: none;"></textarea>
+
+                    </div>
+        </form>
+        <!-- The Modal -->
+        <div id="myModal" class="Localmodal">
+          <span class="close">&times;</span>
+          <img class="modal-content" id="img01">
+          <div id="caption"></div>
+        </div>
+      </div>
   </body>
   <%- include('../partials/dependencies-js') %>
     <script>
@@ -176,7 +180,6 @@ animation-timing-function: linear;
       });
 
 
-      // Listen for the keydown event
       document.addEventListener('keydown', function (event) {
         // Check if the Escape key or Windows key is pressed
         console.log(event.code);
@@ -185,12 +188,12 @@ animation-timing-function: linear;
           event.preventDefault();
         }
       });
-      var  v = '<%= jsonData.Duration %>';
+      var v = '<%= jsonData.Duration %>';
       document.addEventListener("DOMContentLoaded", function () {
-        const fullscreenButton = document.getElementById("fullscreenButton"); // Replace "fullscreenButton" with the ID of your fullscreen button element
+        const fullscreenButton = document.getElementById("fullscreenButton");
         fullscreenButton.addEventListener("click", function () {
           document.getElementById("fullscreenButton").style.display = "none";
-          
+
           const element = document.getElementById("sheet"); // Fullscreen element (e.g., <html> or <body>)
           if (element.requestFullscreen) {
             element.requestFullscreen();
@@ -201,34 +204,23 @@ animation-timing-function: linear;
           } else if (element.msRequestFullscreen) { // Internet Explorer
             element.msRequestFullscreen();
           }
-        
-          //countdown(v);
           progress(v * 60, v * 60, $("#progressBar"));
           document.querySelector('form').style.display = "block";
           //progress(60, 60, $("#progressBar"));
-          let NoOfAttempts=2;
+          let NoOfAttempts = 2;
           $(window).on('blur', function () {
-            if(NoOfAttempts>1){
-            alert("You have Switched to Another Window\nThis is a Final Warning...\n If You Repeat the same Assessment will be Submitted Automatically by the System.");
-            NoOfAttempts--;
-            document.getElementById("AssessmentRemarks").value = "Switched to Another window so auto Submitting the Assessment."
-            }else{
+            if (NoOfAttempts > 1) {
+              alert("WARNING : Switching of Tab's detected.\nAssignment will be auto submitted by system if repeated.");
+              NoOfAttempts--;
+              document.getElementById("AssessmentRemarks").value = "Switching of Tab's detected."
+            } else {
+              alert("Auto Submitting the Assessment.");
               SubmitAssessment();
             }
-            
           });
         });
       });
 
-
-      //  function submitanswer(){
-      //      if(counter>0){
-      //        var c= confirm('Still Time is there Are You Shure You Want to Submit The Exam?'); 
-      //      }
-      //      if(c == true){
-      //           document.getElementById('frm1').submit();
-      //        }
-      //  }
       function progress(timeleft, timetotal, $element) {
         var progressBarWidth = (timeleft * $element.width()) / timetotal;
         $element
