@@ -29,8 +29,8 @@ $(document).ready(function () {
         After filling up the options</p>
         </div>
         <div >
-        <label for="imageInput${questionCounter}" class="form-label">Attach an Image</label>
-        <input class="form-control" type="file" id="imageInput${questionCounter}" name="myQCImage" onchange="uploadImage(this,'section[${activeSection}]question[${questionCounter}][referenceImage]','section[${activeSection}]question[${questionCounter}][uploadedImage]');">
+        <label for="imageInput${questionCounter}" class="form-label">Attach an Image (Max Size 500kb)</label>
+        <input class="form-control" type="file" accept="image/*" id="imageInput${questionCounter}" name="myQCImage" onchange="uploadImage(this,'section[${activeSection}]question[${questionCounter}][referenceImage]','section[${activeSection}]question[${questionCounter}][uploadedImage]');">
          <input type="hidden" name="section[${activeSection}]question[${questionCounter}][referenceImage]" id="section[${activeSection}]question[${questionCounter}][referenceImage]" readonly>
         </div>
         <div>
@@ -95,8 +95,8 @@ $(document).ready(function () {
         <div><p>Choose the Correct Answer.</p>
         </div>
         <div>
-        <label for="imageInput${questionCounter}" class="form-label">Attach an Image</label>
-        <input class="form-control" type="file" id="imageInput${questionCounter}" name="myQCImage" onchange="uploadImage(this,'section[${activeSection}]question[${questionCounter}][referenceImage]','section[${activeSection}]question[${questionCounter}][uploadedImage]');">
+        <label for="imageInput${questionCounter}" class="form-label">Attach an Image (Max Size 500kb)</label>
+        <input class="form-control" type="file" accept="image/*" id="imageInput${questionCounter}" name="myQCImage" onchange="uploadImage(this,'section[${activeSection}]question[${questionCounter}][referenceImage]','section[${activeSection}]question[${questionCounter}][uploadedImage]');">
          <input type="hidden" name="section[${activeSection}]question[${questionCounter}][referenceImage]" id="section[${activeSection}]question[${questionCounter}][referenceImage]" readonly>
         </div>
         <div>
