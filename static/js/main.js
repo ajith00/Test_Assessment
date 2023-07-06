@@ -358,18 +358,6 @@ function SubmitAssessment() {
 }
 
 
-function enterFullScreen(element) {
-  if (element.requestFullscreen) {
-    element.requestFullscreen();
-  } else if (element.mozRequestFullScreen) {
-    element.mozRequestFullScreen();     // Firefox
-  } else if (element.webkitRequestFullscreen) {
-    element.webkitRequestFullscreen();  // Safari
-  } else if (element.msRequestFullscreen) {
-    element.msRequestFullscreen();      // IE/Edge
-  }
-};
-
 function uploadImage(e, NewLocFieldId, NewImageLoc) {
   const fileInput = document.getElementById(e.id);
   const file = fileInput.files[0];
@@ -423,12 +411,4 @@ function UpdateTotalPoints() {
 }
 
 
-document.addEventListener('keydown', function (e) {
-  console.log(e);
-  if (e.shiftKey && e.ctrlKey && e.code == 'KeyI') {
-    e.preventDefault();
-  }
-  if (e.code == "Escape") {
-    e.preventDefault();
-  }
-});
+

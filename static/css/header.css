@@ -283,9 +283,9 @@ nav .icon-burger .line {
 }
 
 .result-card {
+    word-wrap: break-word;
     border-radius: 20px;
-    min-width: 50dvb;
-    max-width: max-content;
+    width: 500px;
     place-items: center;
     background-color: var(--color-background);
     box-sizing: border-box;
@@ -297,18 +297,25 @@ nav .icon-burger .line {
 }
 
 .result-card>h1 {
-    font-family: 'Great Vibes', cursive;
+    /* font-family: 'Great Vibes', cursive; */
     letter-spacing: 3px;
     word-spacing: 5px;
     margin: 10px;
 }
 
 .result-card-pass {
-    background: radial-gradient(circle at 50% 50%, #d4d7d6, #85c8d4, #35aff0, #7a83f5);
+    background: rgb(236,238,238);
+    background: -moz-linear-gradient(0deg, rgba(236,238,238,1) 0%, rgba(141,232,120,0.9641106442577031) 100%);
+    background: -webkit-linear-gradient(0deg, rgba(236,238,238,1) 0%, rgba(141,232,120,0.9641106442577031) 100%);
+    background: linear-gradient(0deg, rgba(236,238,238,1) 0%, rgba(141,232,120,0.9641106442577031) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#eceeee",endColorstr="#8de878",GradientType=1);
 }
 .result-card-fail{
-    background: radial-gradient(circle at 50% 50%, #d7d7d7, #e5c5b4, #efb292, #f59f70);
-}
+    background: rgb(236,238,238);
+    background: -moz-linear-gradient(0deg, rgba(236,238,238,1) 0%, rgba(232,120,136,0.9641106442577031) 100%);
+    background: -webkit-linear-gradient(0deg, rgba(236,238,238,1) 0%, rgba(232,120,136,0.9641106442577031) 100%);
+    background: linear-gradient(0deg, rgba(236,238,238,1) 0%, rgba(232,120,136,0.9641106442577031) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#eceeee",endColorstr="#e87888",GradientType=1);}
 @keyframes floater {
     0% {
         transform: translateY(-90%);
@@ -323,19 +330,19 @@ nav .icon-burger .line {
 
 .animate-charcter {
     background-image: linear-gradient(-225deg,
-            #231557 0%,
-            #44107a 29%,
-            #ff1361 67%,
-            #fff800 100%);
+            #258af7 0%,
+            #060606 29%,
+            #000000 67%,
+            #258af7 100%);
     background-size: auto auto;
     background-clip: border-box;
     background-size: 200% auto;
-    color: #fff;
+    color: #6f6f6f;
     background-clip: text;
     text-fill-color: transparent;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: textclip 2s linear infinite;
+    animation: textclip 3s linear infinite;
     display: inline-block;
 }
 

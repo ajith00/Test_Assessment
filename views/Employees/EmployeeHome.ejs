@@ -13,47 +13,127 @@
     <header>
         <%- include('../partials/employee-header') %>
     </header>
+    <%- include('../partials/dependencies-js') %>
 
-    <div class="main_container d-flex justify-content-evenly">
+        <div class="main_container d-flex justify-content-evenly">
 
-        <div class="card m-2">
-            <div class="card-body">
-                <h5 class="card-title">Take the Assessment</h5>
-                <hr>
-                <form action="/test" method="post">
-                    <input type="text" name="AssesmentKey" id="AssesmentKey" class="form-control"
-                        placeholder="Enter the Assessment Key" required>
-                    <button type="submit" class="btn btn-outline-primary rounded-pill m-2">Take Assessment&nbsp;<i
-                            class="bi bi-arrow-right-circle-fill"></i></button>
-                </form>
-            </div>
-            <div class="card w-90 m-2">
-                <div class="card-body alert alert-warning " role="alert">
-                    <h6>Instruction</h6>
+            <div class="card m-2">
+                <div class="card-body">
+                    <h5 class="card-title">Take the Assessment</h5>
                     <hr>
-                    <ul>
-                        <li>After entering the full screen don't switch to another Windows system will automatically
-                            submit the assessment.</li>
-                        <li>Try to submit the paper within the given time limit.</li>
-                        <li>You are allowed to submit only once, make sure that you have correctly attempted all the
-                            questions before submission.</li>
-                        <li>All questions are compulsory.</li>
-                        <li>Any difficulties while appearing for the Assessment please contact your Trainer.</li>
-                        <li>Make sure all the notifications are disabled.</li>
-                    </ul>
+                    <form action="/VerifyAssessmentKey" method="post" id="AssessmentEntryForm">
+                        <input type="text" name="AssesmentKey" id="AssesmentKey" class="form-control"
+                            placeholder="Enter the Assessment Key" required>
+                        <div class="d-flex justify-content-between">
+                            <button type="submit" class="btn btn-outline-primary rounded-pill m-2">Take Assessment&nbsp;
+                                <i class="bi bi-arrow-right-circle-fill"></i></button>
+                            <p class="btn btn-outline-secondary rounded-pill m-2" data-bs-toggle="modal"
+                                data-bs-target="#Requestmodel">Retake Assessment&nbsp;
+                                <i class="bi bi-question-circle-fill"></i>
+                            </p>
+                        </div>
+                    </form>
                 </div>
-            </div>
-            <% if (message) { %>
-                <div class="alert alert-danger" role="alert">
-                    <%= message %>
+                <div class="card w-90 m-2">
+                    <div class="card-body bg-secondary bg-gradient text-white" role="alert">
+                        <h6>Instruction</h6>
+                        <hr>
+                        <ul>
+                            <!-- <li>After entering the full screen don't switch to another Windows system will automatically
+                                submit the assessment.</li> -->
+                            <li>After Starting the ASsessment don't switch to another Windows don't try to use dual
+                                screen, system will automatically
+                                submit the assessment.</li>
+                            <li>Try to submit the paper within the given time limit.</li>
+                            <li>You are allowed to submit only once, make sure that you have correctly attempted all the
+                                questions before submission.</li>
+                            <li>All questions are compulsory.</li>
+                            <li>Any difficulties while appearing for the Assessment please contact your Trainer.</li>
+                            <li>Make sure all the notifications are disabled.</li>
+                        </ul>
+                    </div>
                 </div>
-                <% } %>
-        </div>
-    </div>
+                <!-- Modal -->
+                <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false"
+                    tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5 text-warning" id="staticBackdropLabel"><i
+                                        class="bi bi-exclamation-triangle"></i>&nbsp;Warning</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p class="form-label" id="model_message">Please Maximize Your Browser or Exit from Dual
+                                    Screen
+                                    to Take up the Assessment</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Ok</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--AIP Request Modal -->
+                <div class="modal fade" id="Requestmodel" data-bs-backdrop="static" data-bs-keyboard="false"
+                    tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-xl">
+                        <div class="modal-content ">
+                            <div class="modal-header">
+                                <h3 class="modal-title fs-5" id="staticBackdropLabel">Send a Request to Your Trainer
+                                </h3>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="requestAssessmentKey" placeholder="key">
+                                    <label for="requestAssessmentKey">Assessment Key</label>
+                                </div>
+                                <div class="form-floating mb-3">
+                                    <textarea class="form-control" id="requestAssessmentDesc" cols="50"
+                                        spellcheck="true" placeholder="Message"></textarea>
+                                        <label for="requestAssessmentDesc">Message</label>
 
-    <footer>
-        <%- include('../partials/footer') %>
-    </footer>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Send &nbsp;<i
+                                        class="bi bi-send-fill"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <% if (message) { %>
+                    <script>
+                        document.addEventListener("DOMContentLoaded", function () {
+                            document.getElementById("model_message").innerText = atob(JSON.parse('<%- JSON.stringify(message) %>'));
+                            document.getElementById("staticBackdropLabel").innerHTML = '<i class="bi bi-info-circle"></i>&nbsp; Info'
+                            $("#staticBackdrop").modal('show');
+                        });
+                    </script>
+                    <% } %>
+            </div>
+        </div>
+
 </body>
-<%- include('../partials/dependencies-js') %>
+<footer>
+    <%- include('../partials/footer') %>
+</footer>
+<script>
+    //   window.onload = function() {
+    //     $("#staticBackdrop").modal('show');
+    //     };
+    document.getElementById("AssessmentEntryForm").addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (crossCheckScreenSize()) {
+            document.getElementById("AssessmentEntryForm").submit();
+        } else {
+            $("#staticBackdrop").modal('show');
+        }
+    });
+    const socket=io();
+</script>
+
 </html>

@@ -1,5 +1,6 @@
 const express = require('express');
 const session = require('express-session');
+const queryString = require('querystring');
 const app = express();
 const path = require("path");
 const mysql = require('mysql');
@@ -66,7 +67,7 @@ db.connect((error) => {
 
 
 const port = 4000;
-const host="172.17.1.22"
+const host = "172.17.1.22"
 const server = app.listen(port, function () {
   console.log("App is listening at http://localhost:%s", port);
 });
@@ -87,7 +88,7 @@ app.get('/', (req, res) => {
 
 app.get('/CreateAssessment', (req, res) => {
   if (req.session.UserID) {
-    res.render("admin/create_assessment");
+    res.render("Trainer/create_assessment");
   } else {
     res.redirect('/login');
   }
@@ -129,7 +130,7 @@ app.get('/viewAssessment', (req, res) => {
     if (err) throw err;
     if (result.length > 0) {
       jsonData = JSON.parse(result[0].Questionnaire);
-      res.render("admin/view_assessment", { jsonData: jsonData, "result": result[0], message: null });
+      res.render("Trainer/view_assessment", { jsonData: jsonData, "result": result[0], message: null });
     } else {
       res.redirect('/error');
     }
@@ -137,7 +138,7 @@ app.get('/viewAssessment', (req, res) => {
   })
 });
 
-app.post('/test', (req, res) => {
+app.post('/VerifyAssessmentKey', (req, res) => {
   let jsonData;
   db.query("select * from assessments where AssesmentKey=?", [req.body.AssesmentKey], function (error, result) {
     if (result.length > 0) {
@@ -145,15 +146,19 @@ app.post('/test', (req, res) => {
       db.query("Select * from responces where employeeid=? and AssessmentID=?", [req.session.UserID, result[0].AssessmentID], function (error, result1) {
         if (error) throw error
         if (result1.length > 0) {
-
-          res.render('Employees/EmployeeHome', { message: "You have already Appeared for this Assessment.\nIf not Contact Support Team." });
+          const queryData = queryString.stringify({
+            message: Buffer.from("You have already Appeared for this Assessment.If not contact your Trainer.").toString('base64')
+          });
+          res.redirect('/EmployeeHome?' + queryData);
         } else {
-
           res.render('Employees/takeAssessment', { jsonData: jsonData, "result": result[0], message: null });
         }
       });
     } else {
-      res.render('Employees/EmployeeHome', { message: "Invalid Assessment Key" });
+      const queryData = queryString.stringify({
+        message: Buffer.from("Invalid Assessment Key").toString('base64')
+      });
+      res.redirect('/EmployeeHome?' + queryData);
     }
   });
 
@@ -182,7 +187,13 @@ app.get('/login', (req, res) => {
 
 app.get('/EmployeeHome', (req, res) => {
   if (req.session.UserID && req.session.UserRole == "Employee") {
-    res.render('Employees/EmployeeHome', { message: null });
+    var message;
+    if (req.query.message != undefined && req.query.message != "") {
+      message = req.query.message;
+      res.render('Employees/EmployeeHome', { message: message });
+    } else {
+      res.render('Employees/EmployeeHome', { message: null });
+    }
   } else {
     res.redirect('/login');
   }
@@ -203,7 +214,7 @@ app.get('/TrainerHome', (req, res) => {
             result.AssessmentID = record.AssessmentID;
             result.AssessmentName = record.AssessmentName;
             result.Description = record.Description;
-            result.AssessmentDate =formatDateString(record.AssessmentDate);
+            result.AssessmentDate = formatDateString(record.AssessmentDate);
             result.Duration = record.Duration;
             result.AssesmentKey = record.AssesmentKey;
             result.MaximumScore = record.MaximumScore;
@@ -358,7 +369,7 @@ app.post('/submit-assessment', (req, res) => {
       }
       Result.TotalScore = totalScore;
       Result.Message = message;
-      Result.Result=resultLabel;
+      Result.Result = resultLabel;
       const inputData = {
         AssessmentID: req.body.AssessmentID,
         answerscript: JSON.stringify(answerScript),
@@ -373,7 +384,7 @@ app.post('/submit-assessment', (req, res) => {
       res.render('Employees/Result', { Result: Result });
     });
   } else {
-    res.send
+    res.redirect('/login');
   }
 });
 app.get("/viewResultBoard", (req, res) => {
@@ -397,7 +408,7 @@ app.get("/viewResultBoard", (req, res) => {
             result.SecuredMarks = temp.TotalScore;
             result.Message = temp.Message;
             result.remarks = record.remarks;
-            result.Result=temp.Result;
+            result.Result = temp.Result;
             result.percentage = temp.SecuredPercentage;
             result.detailedResult = record.obtainedmarks;
             ConsolidatedResult.push(result);
@@ -434,7 +445,7 @@ app.get('/Error', (req, res) => {
 });
 
 app.get('*', (req, res) => {
-  res.render('login', { "message": "Succes" })
+  res.redirect('/login');
 });
 function formatDateString(dateString) {
   const date = new Date(dateString);
