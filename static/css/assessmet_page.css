@@ -8,13 +8,13 @@
   height: 100%;
   width: 100%;
   background: rgb(255 255 255);
-  overflow: scroll;
+  /* overflow: scroll; */
   position: relative;
   left: 0;
   right: 0;
   top: 0;
   z-index: 10;
-  overflow-y: scroll;
+  /* overflow-y: scroll; */
 
 }
 
@@ -150,12 +150,11 @@ input[type=radio] {
 
 .localCard {
   transition: 0.2s ease-in-out;
-  cursor: pointer;
 }
 
 .localCard:hover {
   /* top: -10px; */
-  transform: scale(1.15);
+  transform: scale(1.02);
   z-index: 2;
   box-shadow: 0px 20px 40px 0px rgba(61, 65, 84, 0.15);
 }
@@ -172,4 +171,32 @@ margin:5px 15px 5px 5px;
 }
 input[type='radio']:hover{
   border: 1px solid #0d6efd;
+}
+input[readonly]{
+  cursor: not-allowed;
+}
+
+#notification-tab>div>p{
+  align-self: center;
+  font-size: 20px;
+  rotate: 180deg;
+  text-orientation: sideways;
+writing-mode: vertical-rl;
+}
+.notification-area{
+  display: flex;
+  right: 5px;
+  top: 100px;
+  position: absolute;
+  min-width: 25px;
+  min-height: max-content;
+  background-color: #bbb;
+  transition: all 1s ease-in-out;
+  -webkit-transition: all 1s ease-in-out;
+  -moz-transition: all 1s ease-in-out;    
+
+}
+.notification-area:hover{
+  width: 300px;
+
 }

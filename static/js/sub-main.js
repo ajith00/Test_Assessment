@@ -1,5 +1,4 @@
 document.addEventListener('keydown', function (e) {
-    console.log(e);
     if (e.shiftKey && e.ctrlKey && e.code == 'KeyI') {
       e.preventDefault();
     }

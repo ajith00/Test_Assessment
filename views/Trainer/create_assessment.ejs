@@ -27,24 +27,24 @@
                   placeholder="Description Of the Assessment">
               </div>
             </div>
-            
+
             <div class="col-md">
               <div class="row">
+                <!-- <div class="col-md">
+                  <div class="input-group mb-3">
+                    <span class="input-group-text" for="AssessmentDate">Date</span>
+                    <input type="date" name="AssessmentDate" id="AssessmentDate" class="form-control" min="yyyy-mm-dd"
+                      required>
+                  </div>
+                </div> -->
                 <div class="col-md">
-              <div class="input-group mb-3">
-                <span class="input-group-text" for="AssessmentDate">Date</span>
-                <input type="date" name="AssessmentDate" id="AssessmentDate" class="form-control" min="yyyy-mm-dd"
-                  required>
-              </div>
-              </div>
-              <div class="col-md">
-                <div class="input-group mb-3">
-                  <span class="input-group-text" for="AssessmentTotalMarks">Total Score</span>
-                  <input type="number" name="AssessmentTotalMarks" id="AssessmentTotalMarks" class="form-control"
-                    value="" min="0" required>
+                  <div class="input-group mb-3">
+                    <span class="input-group-text" for="AssessmentTotalMarks">Total Score</span>
+                    <input type="number" name="AssessmentTotalMarks" id="AssessmentTotalMarks" class="form-control"
+                      value="" min="0" required readonly>
+                  </div>
                 </div>
               </div>
-            </div>
               <div class="row">
                 <div class="col-md">
                   <div class=" input-group mb-3">
@@ -56,7 +56,7 @@
                 </div>
                 <div class="col-md">
                   <div class=" input-group mb-3">
-                    <span class="input-group-text" for="AssessmentDuration">Cut-Off</span>
+                    <span class="input-group-text" for="AssessmentCutoff">Cut-Off</span>
                     <input type="number" name="AssessmentCutoff" id="AssessmentCutoff" class="form-control" min="40"
                       max="100" required placeholder="Min 40%">
                     <span class="input-group-text">%</span>
@@ -67,17 +67,19 @@
             </div>
           </div>
 
-          <div class="accordion section mySection" id="accordionSection1" data-section="1" onclick="updateActiveSheet(this)">
+          <div class="accordion section mySection" id="accordionSection1" data-section="1"
+            onclick="updateActiveSheet(this)">
             <div class="accordion-item">
               <h2 class="accordion-header d-flex justify-content-between">
-                
+
                 <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#section1"
                   aria-expanded="true" aria-controls="section1">
-                
-                  <input type="text" class="form-control bg-light-subtle border border-light-subtle rounded-pill w-25" name="SectionName" id="" placeholder="Please enter the section-1 name" required>
-                  <p class="container px-1 mb-1 text-center">Max-Points:&nbsp;<b><span class="sectionScore" id="sectionScore1">0</b></span></p>
-                </button>
 
+                  <input type="text" class="form-control bg-light-subtle border border-light-subtle rounded-pill w-25"
+                    name="SectionName" id="" placeholder="Please enter the section-1 name" required>
+                  <p class="container px-1 mb-1 text-center">Max-Points:&nbsp;<b><span class="sectionScore"
+                        id="sectionScore1">0</b></span></p>
+                </button>
               </h2>
               <div id="section1" class="accordion-collapse collapse show" data-bs-parent="#accordionSection1">
                 <div class="accordion-body" id="questionsContainer1">
@@ -88,16 +90,17 @@
                     data-bs-target="#AddNewItem">
                     Add <i class="bi bi-plus-circle"></i>
                   </button>
-                  <button type="button" class="btn mb-1 btn-outline-danger rounded-pill removeSectionBtn" data-bs-toggle="modal" data-section="1">
+                  <button type="button" class="btn mb-1 btn-outline-danger rounded-pill removeSectionBtn"
+                    data-bs-toggle="modal" data-section="1">
                     Delete <i class="bi bi-trash3"></i>
-                  </button> 
+                  </button>
                 </div>
               </div>
             </div>
           </div>
         </div>
         <div class="container px-1 mb-1 text-center d-grid gap-2 col-2 mx-auto">
-          <button type="submit" class="btn btn-outline-success">Submit</button>
+          <button type="submit" class="btn btn-outline-success">Save &nbsp;<i class="bi bi-cloud-arrow-up"></i></button>
           <textarea name="JsonFormData" id="JsonFormData" style="display: none;"></textarea>
         </div>
       </form>
@@ -142,15 +145,15 @@
 
   </body>
   <%- include('../partials/dependencies-js') %>
-  <script>
-    document.getElementById("questionnaire").addEventListener('submit', (e) => {
-      e.preventDefault();
-      submitForm();
-    });
+    <script>
+      document.getElementById("questionnaire").addEventListener('submit', (e) => {
+        e.preventDefault();
+        submitForm();
+      });
 
-    $('#Image_Model').on('show.bs.modal', function (event) {
-});
-  </script>
+      $('#Image_Model').on('show.bs.modal', function (event) {
+      });
+    </script>
 
 
 </html>

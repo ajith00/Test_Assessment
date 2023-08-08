@@ -1,10 +1,11 @@
 const express = require('express');
 const session = require('express-session');
+const db = require('./DataBaseConnection')
 const queryString = require('querystring');
 const app = express();
 const path = require("path");
-const mysql = require('mysql');
 const bodyParser = require('body-parser');
+const fs = require('fs');
 const { userInfo } = require('os');
 var dateTime = require('node-datetime');
 const { Server } = require('socket.io');
@@ -13,23 +14,33 @@ const { Socket } = require('dgram');
 const { Console, error } = require('console');
 const multer = require('multer');
 const router = express.Router();
-const fs = require('fs');
+
 const DateTime = require('node-datetime/src/datetime');
 const { restart } = require('nodemon');
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json())
 app.engine('html', require('ejs').renderFile);
 app.set("view engine", "ejs");
 app.use(express.static(`${__dirname}`));
+app.use(session({
+  resave: false,
+  saveUninitialized: true,
+  secret: 'XCR3rsasa%RDHHH',
+  cookie: { maxAge: 86400000 }
+}));
 
-// Set up MySQL connection
-const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: 'ajith001',
-  database: 'QuadgenAssesmentPortal',
-  multipleStatements: true
-});
+//Router Config
+const api_router = require('./routes/api');
+const trainer_router = require('./routes/trainer');
+const employee_router = require('./routes/employee');
+const admin_router = require('./routes/admin');
+app.use('/api', api_router);
+app.use('/Trainer', trainer_router);
+app.use('/Employee', employee_router);
+app.use('/Admin', admin_router);
+
+
 //Setting up Storage Area
 const myStorage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -49,12 +60,16 @@ const myFileFilter = (req, file, error) => {
 };
 const upload = multer({ storage: myStorage, limits: { fileSize: 500000 } }).single("myQCImage");
 
-app.use(session({
-  resave: false,
-  saveUninitialized: true,
-  secret: 'XCR3rsasa%RDHHH',
-  cookie: { maxAge: 86400000 }
-}));
+app.post('/uploadImage', (req, res) => {
+  upload(req, res, function (err) {
+    if (err) {
+      console.log(err);
+      res.status(400).send(err);
+    } else {
+      res.send(res.req.file.filename);
+    }
+  });
+});
 
 
 db.connect((error) => {
@@ -83,16 +98,8 @@ app.get('/logout', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  res.render('login', { "message": "Success" })
+  res.redirect('/login');
 });
-
-app.get('/CreateAssessment', (req, res) => {
-  if (req.session.UserID) {
-    res.render("Trainer/create_assessment");
-  } else {
-    res.redirect('/login');
-  }
-})
 
 app.post('/submit-questionnaire', (req, res) => {
   let characters = "ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz1234567890";
@@ -110,46 +117,44 @@ app.post('/submit-questionnaire', (req, res) => {
     "Description": FormData.Description,
     "Questionnaire": questionnaire,
     "MaximumScore": FormData.TotalScore,
-    "AssessmentDate": FormData.Date,
     "Duration": FormData.Duration,
     "CreatedOn": CurrentDate,
     "CreatedBy": req.session.UserID,
-    "LastUpated": null,
     "AssesmentKey": randomString
   };
   db.query("Insert into assessments set?", [inputData], function (error, result) {
     if (error) throw error
     else
-      return res.redirect('/TrainerHome');
+      return res.redirect('/Trainer');
   });
 });
 
-app.get('/viewAssessment', (req, res) => {
-  let jsonData;
-  db.query("SELECT * FROM assessments where CreatedBy=? and AssesmentKey=?", [req.session.UserID, req.query.AssesmentKey], function (err, result) {
-    if (err) throw err;
-    if (result.length > 0) {
-      jsonData = JSON.parse(result[0].Questionnaire);
-      res.render("Trainer/view_assessment", { jsonData: jsonData, "result": result[0], message: null });
-    } else {
-      res.redirect('/error');
-    }
 
-  })
-});
 
-app.post('/VerifyAssessmentKey', (req, res) => {
-  let jsonData;
-  db.query("select * from assessments where AssesmentKey=?", [req.body.AssesmentKey], function (error, result) {
+app.post('/oldVerifyAssessmentKey', (req, res) => {
+  let jsonData, queryData;
+  db.query("select * from assessments where AssesmentKey=? and Status='Published'", [req.body.AssesmentKey], function (error, result) {
     if (result.length > 0) {
       jsonData = JSON.parse(result[0].Questionnaire);
       db.query("Select * from responces where employeeid=? and AssessmentID=?", [req.session.UserID, result[0].AssessmentID], function (error, result1) {
         if (error) throw error
         if (result1.length > 0) {
-          const queryData = queryString.stringify({
+          queryData = queryString.stringify({
             message: Buffer.from("You have already Appeared for this Assessment.If not contact your Trainer.").toString('base64')
           });
-          res.redirect('/EmployeeHome?' + queryData);
+          db.query("SELECT * FROM repeatrequest where assessmentkey=? and userID=? and status!='Approved'", [req.body.AssesmentKey, req.session.UserID], function (err, result2) {
+            if (err) throw err
+            if (result2.length > 0) {
+              console.log(result2);
+              queryData = queryString.stringify({
+                message: Buffer.from("You request is not yet approved by your trainer.Please try after sometime.").toString('base64')
+              });
+              res.redirect('/Employee?' + queryData);
+            } else {
+              res.render('Employees/takeAssessment', { jsonData: jsonData, "result": result[0], message: null });
+            }
+          });
+
         } else {
           res.render('Employees/takeAssessment', { jsonData: jsonData, "result": result[0], message: null });
         }
@@ -158,23 +163,60 @@ app.post('/VerifyAssessmentKey', (req, res) => {
       const queryData = queryString.stringify({
         message: Buffer.from("Invalid Assessment Key").toString('base64')
       });
-      res.redirect('/EmployeeHome?' + queryData);
+      res.redirect('/Employee?' + queryData);
     }
   });
+})
 
+app.post('/ExamHall', (req, res) => {
+  let jsonData, queryData;
+  db.query("select * from assessments where AssesmentKey=? and Status='Published'", [req.body.AssesmentKey], function (error, result) {
+    if (result.length > 0) {
+      jsonData = JSON.parse(result[0].Questionnaire);
+      db.query("select R.idresponces,R.AssessmentID,R.employeeid,RR.id,RR.assessmentkey,RR.userID,RR.trainerid,RR.status from responces as R,repeatrequest as RR where RR.userID=? and RR.assessmentkey=? and RR.userID=R.employeeid and RR.status!='Approved';", [req.session.UserID, req.body.AssesmentKey], function (error, result1) {
+        if (error) throw error
+        if (result1.length > 0) {
+          queryData = queryString.stringify({
+            message: Buffer.from("You have already Appeared for this Assessment.If not contact your Trainer.").toString('base64')
+          });
+          res.redirect('/Employee?' + queryData);
+          // db.query("SELECT * FROM repeatrequest where assessmentkey=? and userID=? and status!='Approved'", [req.body.AssesmentKey, req.session.UserID], function (err, result2) {
+          //   if (err) throw err
+          //   if (result2.length > 0) {
+          //     console.log(result2);
+          //     queryData = queryString.stringify({
+          //       message: Buffer.from("You request is not yet approved by your trainer.Please try after sometime.").toString('base64')
+          //     });
+          //     res.redirect('/Employee?' + queryData);
+          //   } else {
+          //     res.render('Employees/takeAssessment', { jsonData: jsonData, "result": result[0], message: null });
+          //   }
+          // });
+
+        } else {
+          res.render('Employees/takeAssessment', { jsonData: jsonData, "result": result[0], message: null });
+        }
+      });
+    } else {
+      const queryData = queryString.stringify({
+        message: Buffer.from("Invalid Assessment Key").toString('base64')
+      });
+      res.redirect('/Employee?' + queryData);
+    }
+  });
 })
 
 app.get('/login', (req, res) => {
   if (req.session.UserID) {
     switch (req.session.UserRole) {
       case "Employee":
-        res.redirect('/EmployeeHome');
+        res.redirect('/Employee');
         break;
       case "Trainer":
-        res.redirect('/TrainerHome');
+        res.redirect('/Trainer');
         break;
       case "Admin":
-        res.redirect('/adminHome');
+        res.redirect('/Admin');
         break;
       default:
         res.render('login');
@@ -185,125 +227,9 @@ app.get('/login', (req, res) => {
   }
 });
 
-app.get('/EmployeeHome', (req, res) => {
-  if (req.session.UserID && req.session.UserRole == "Employee") {
-    var message;
-    if (req.query.message != undefined && req.query.message != "") {
-      message = req.query.message;
-      res.render('Employees/EmployeeHome', { message: message });
-    } else {
-      res.render('Employees/EmployeeHome', { message: null });
-    }
-  } else {
-    res.redirect('/login');
-  }
-});
-
-app.get('/TrainerHome', (req, res) => {
-  if (req.session.UserID && req.session.UserRole == "Trainer") {
-    let ConsolidatedInfo = [];
-    let result = {};
-    db.query("select * from assessments where CreatedBy=?", [req.session.UserID], function (error, resultOne) {
-      if (error) throw error
-      if (resultOne.length > 0) {
-        let counter = 0;
-        resultOne.forEach(record => {
-          db.query('select count(*) as ResponseCount from responces where  AssessmentID=?', [record.AssessmentID], function (error, resultTwo) {
-            if (error) throw error
-            result = {};
-            result.AssessmentID = record.AssessmentID;
-            result.AssessmentName = record.AssessmentName;
-            result.Description = record.Description;
-            result.AssessmentDate = formatDateString(record.AssessmentDate);
-            result.Duration = record.Duration;
-            result.AssesmentKey = record.AssesmentKey;
-            result.MaximumScore = record.MaximumScore;
-            result.ResponseCount = resultTwo[0].ResponseCount;
-            ConsolidatedInfo.push(result);
-            counter++;
-            if (counter === resultOne.length) {
-              res.render('Trainer/TrainerHome', { data: ConsolidatedInfo });
-            }
-          });
-        });
-      } else {
-        res.render('Trainer/TrainerHome', { data: ConsolidatedInfo });
-      }
-    });
-  } else {
-    res.redirect('/login');
-  }
-});
-
-app.get('/viewResponces', (req, res) => {
-  if (req.session.UserID && req.session.UserRole == "Trainer" || req.session.UserRole == "Admin") {
-    let ConsolidatedResponces = [];
-    let result = {};
-    db.query("select * from responces where AssessmentID=?", [req.query.AssessmentID], function (error, resultOne) {
-      if (error) throw error;
-      if (resultOne.length > 0) {
-        let counter = 0;
-        console.log(result);
-        resultOne.forEach(record => {
-          db.query("select * from userlogin where empId=?", [record.employeeid], function (error, resultTwo) {
-            if (error) throw error;
-            result = {};
-            result.SubmittedDate = formatDateString(record.date);
-            let temp = JSON.parse(record.obtainedmarks);
-            result.EmployeeName = resultTwo[0].employeeName;
-            result.SecuredMarks = temp.TotalScore;
-            result.SecuredPercentage = temp.SecuredPercentage;
-            result.Result = temp.Result;
-            if (record.remarks) {
-              result.Remarks = record.remarks;
-            } else {
-              result.Remarks = "";
-            }
-            ConsolidatedResponces.push(result);
-            counter++;
-            if (counter === resultOne.length) {
-              res.render("Trainer/ResponseDashboard", { Data: ConsolidatedResponces });
-            }
-          });
-        });
-      } else {
-        res.render("Trainer/ResponseDashboard", { Data: ConsolidatedResponces });
-
-      }
-
-    });
-  } else {
-    res.redirect('/login');
-  }
-});
-
-app.get('/adminHome', (req, res) => {
-  if (req.session.UserID && req.session.UserRole == "Admin") {
-    let count, employee, admin, trainer;
-    db.query("select count(*) as totalUser from userlogin", function (error, result1) {
-      count = result1[0].totalUser;
-    });
-    db.query("select count(*) as noofemployee from userlogin where role='Employee'", function (error, result1) {
-      employee = result1[0].noofemployee;
-    });
-    db.query("select count(*) as nooftrainer from userlogin where role='Trainer'", function (error, result1) {
-      trainer = result1[0].nooftrainer;
-    });
-    db.query("select count(*) as noofadmin from userlogin where role='Admin'", function (error, result1) {
-      admin = result1[0].noofadmin;
-    });
-    db.query("select * from assessments", function (error, result) {
-      if (error) throw error
-      res.render('admin/adminHome', { data: result, TotalCount: count, employeecount: employee, trainercount: trainer, admincount: admin });
-    })
-  } else {
-    res.redirect('/login');
-  }
-
-})
 app.post('/AuthenticateLogin', (req, res) => {
   var UserInfo = req.body;
-  db.query("select * from userlogin where empId=? or email=? and password=?", [UserInfo.email, UserInfo.email, UserInfo.password], function (error, result) {
+  db.query("select * from userlogin where empId=? or email=? and password=? and status", [UserInfo.email, UserInfo.email, UserInfo.password], function (error, result) {
     if (error) throw error;
     if (result.length > 0) {
       db.query("update userlogin set lastSeen=? where empId=?", [CurrentDate, result[0].empId], function (error, result) {
@@ -312,11 +238,11 @@ app.post('/AuthenticateLogin', (req, res) => {
       req.session.UserID = result[0].empId;
       req.session.UserRole = result[0].role;
       if (result[0].role == "Employee") {
-        res.redirect('/EmployeeHome');
+        res.redirect('/Employee');
       } else if (result[0].role == "Trainer") {
-        res.redirect('/TrainerHome');
+        res.redirect('/Trainer');
       } else if (result[0].role == "Admin") {
-        res.redirect('/adminHome');
+        res.redirect('/Admin');
       } else {
         return res.send("Internal Server Error");
       }
@@ -387,65 +313,22 @@ app.post('/submit-assessment', (req, res) => {
     res.redirect('/login');
   }
 });
-app.get("/viewResultBoard", (req, res) => {
+
+
+app.get('/Error', (req, res) => {
+  res.render('error');
+});
+app.get('/changePassword',(req,res)=>{
   if (req.session.UserID) {
-    let ConsolidatedResult = [];
-    let result = {};
-    db.query("select * from responces where employeeid=?", [req.session.UserID], function (error, resultOne) {
-      if (error) throw error
-      if (resultOne.length > 0) {
-        let counter = 0;
-        resultOne.forEach(record => {
-          db.query("select * from assessments where AssessmentID=?", [record.AssessmentID], function (error, resultTwo) {
-            if (error) throw error;
-            result = {};
-            result.Date = formatDateString(record.date);
-            result.AssessmentName = resultTwo[0].AssessmentName;
-            result.TotalScore = resultTwo[0].MaximumScore;
-            let temp = JSON.parse(resultTwo[0].Questionnaire);
-            result.cutOff = temp.Cutoff;
-            temp = JSON.parse(record.obtainedmarks);
-            result.SecuredMarks = temp.TotalScore;
-            result.Message = temp.Message;
-            result.remarks = record.remarks;
-            result.Result = temp.Result;
-            result.percentage = temp.SecuredPercentage;
-            result.detailedResult = record.obtainedmarks;
-            ConsolidatedResult.push(result);
-            counter++;
-            if (counter === resultOne.length) {
-              res.render("Employees/ResultBoard", { Data: ConsolidatedResult });
-            }
-          });
-        });
-      } else {
-        res.render("Employees/ResultBoard", { Data: ConsolidatedResult });
-      }
-    });
-  } else {
+    res.render('ChangePassword')
+  }else{
     res.redirect('/login');
   }
 });
 
-app.post('/api/uploadImage', (req, res) => {
-  upload(req, res, function (err) {
-    if (err) {
-      console.log(err);
-      res.status(400).send(err);
-    } else {
-      res.send(res.req.file.filename);
-    }
-  });
-});
-app.get('/result', (req, res) => {
-  res.render('Employees/Result', { Result: "ok" })
-});
-app.get('/Error', (req, res) => {
-  res.render('error');
-});
-
 app.get('*', (req, res) => {
-  res.redirect('/login');
+  //res.redirect('/login');
+  res.status(400).send("Page Not Found");
 });
 function formatDateString(dateString) {
   const date = new Date(dateString);

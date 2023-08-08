@@ -169,7 +169,7 @@ $(document).ready(function () {
   $(document).on('click', '.removeSectionBtn', function () {
     const sectionNumber = $(this).data('section');
     console.log(sectionNumber);
-    if(confirm("Are you sure you want to delete this section...?") && sectionCounter>2){
+    if (confirm("Are you sure you want to delete this section...?") && sectionCounter > 2) {
       $(`div.section[data-section="${sectionNumber}"]`).remove();
       sectionCounter--;
       updateSectionNumbers();
@@ -239,7 +239,7 @@ function updateQuestionNumbers() {
   });
 }
 
-function updateSectionNumbers(){
+function updateSectionNumbers() {
   $('.mySection').each(function (index) {
     const newSectionCounter = index + 1;
     // Update section ID
@@ -254,7 +254,7 @@ function updateSectionNumbers(){
     $(this).find('input').attr('placeholder', 'Please enter the section-' + newSectionCounter + ' name');
     // Update Max-Points ID
     $(this).find('.sectionScore').attr('id', 'sectionScore' + newSectionCounter);
-    
+
     // Update data-bs-parent attribute
     $(this).find('.accordion-collapse').attr('data-bs-parent', '#accordionSection' + newSectionCounter);
     $(this).find('.accordion-collapse').attr('id', 'section' + newSectionCounter);
@@ -263,7 +263,7 @@ function updateSectionNumbers(){
     $(this).find('.accordion-body').attr('id', 'questionsContainer' + newSectionCounter);
 
     $(this).find('.removeSectionBtn').attr('data-section', newSectionCounter);
-});
+  });
 }
 
 function submitForm() {
@@ -272,7 +272,7 @@ function submitForm() {
   let i = 1;
   formData.Title = document.getElementById("AssessmentTitle").value;
   formData.Description = document.getElementById("AssessmentDescriptinon").value;
-  formData.Date =  document.getElementById("AssessmentDate").value;
+  //formData.Date = document.getElementById("AssessmentDate").value;
   formData.Duration = document.getElementById("AssessmentDuration").value;
   formData.Cutoff = document.getElementById("AssessmentCutoff").value;
 
@@ -325,7 +325,6 @@ function submitForm() {
   });
   formData.TotalScore = TotalScore;
   document.getElementById("JsonFormData").value = JSON.stringify(formData);
-  console.log(formData);
   document.getElementById("questionnaire").submit();
 }
 
@@ -354,7 +353,7 @@ function SubmitAssessment() {
     i++
   });
   document.getElementById("JsonFormData").value = JSON.stringify(answerData);
-  document.getElementById("answerScript").submit(); 
+  document.getElementById("answerScript").submit();
 }
 
 
@@ -370,7 +369,7 @@ function uploadImage(e, NewLocFieldId, NewImageLoc) {
     })
     .catch(error => {
       console.error(error);
-    });
+    })
 }
 
 function displayImage(file, NewImageLoc) {
@@ -378,7 +377,7 @@ function displayImage(file, NewImageLoc) {
   reader.onload = function () {
     const uploadedImage = document.getElementById(NewImageLoc);
     uploadedImage.src = reader.result;
-    uploadedImage.style.display="block";
+    uploadedImage.style.display = "block";
   };
   reader.readAsDataURL(file);
 }

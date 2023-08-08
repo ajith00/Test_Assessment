@@ -53,11 +53,11 @@
             </div>
           </div>
           <div class="col-md">
-            <div class="input-group mb-3">
+            <!-- <div class="input-group mb-3">
               <span class="input-group-text" for="AssessmentDate">Date</span>
               <input type="date" name="AssessmentDate" id="AssessmentDate" class="form-control" min="yyyy-mm-dd"
                 value="<%= jsonData.Date %>" readonly>
-            </div>
+            </div> -->
             <div class="row">
               <div class="col-md">
                 <div class=" input-group mb-3">
@@ -250,6 +250,7 @@
             document.getElementById("AssessmentRemarks").value = "Switching of Tab's detected."
           } else {
             $("#FullstaticBackdrop").modal('hide');
+            document.getElementById("AssessmentRemarks").value = "Switching of Tab's detected."
             alert("Switching of Tab's detected.\nAuto Submitting the Assessment in 5 Seconds...!");
             window.setTimeout(function () {
               SubmitAssessment();
